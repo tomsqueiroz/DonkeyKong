@@ -4,7 +4,7 @@
 .include "IIzeradocompleto.s"
 .include "Topzerado.s"
 .include "Mzeradocompleto.s"
-.include "bonus5000.s"
+.include "bonus5000t.s"
 .include "Lzerado.s"
 .include "princess_pe_direito_ok.s"
 .include "princess_pe_esquerdo_ok.s"
@@ -14,18 +14,19 @@
 .include "macaco_barril_esquerda_ok.s"
 .include "macaco_barril_centro_ok.s"
 .include "macaco_barril_direita_ok.s"
+.include "I9.s"
 
 .include "parametros.s"
 
 
 .text
 
-#Alterar valor de sp para passar da memória do controle do jogo posicoes e status
+#Alterar valor de sp para passar da memï¿½ria do controle do jogo posicoes e status
 
 jal ra, Phase1
 jal ra, zeraTudo
 jal ra, setValoresIniciais
-
+jal ra, PontuaI
 LOOP_MOVIMENTA_DK: jal ra, movimenta_dk
 j LOOP_MOVIMENTA_DK
 
@@ -60,8 +61,25 @@ setValoresIniciais:
 	sw t2, 20(s0)
 	sw t3, 24(s0)
 	sw t4, 28(s0)
+	
+	#Seta Valores Iniciais de Pont. I
+	li t0, CONST_D0
+	li t1, CONST_D1
+	li t2, CONST_D2
+	li t3, CONST_D3
+	li t4, CONST_D4
+	li t5, CONST_D5
+	li t6, CONST_I_Y
+	sw t0, 32(s0)
+	sw t1, 36(s0)
+	sw t2, 40(s0)
+	sw t3, 44(s0)
+	sw t4, 48(s0)
+	sw t5, 52(s0)
+	sw t6, 56(s0)
+	
+	addi sp, sp, -56
 	ret
-
 
 Phase1:
 # Carrega a imagem1
@@ -80,7 +98,7 @@ LOOP1: 	beq t1,t2,FIM		# Se for o ï¿½ltimo endereï¿½o entï¿½o sai do loop
 
 FIM:	ret
 
-zeraTudo: #zera todos as pontuações
+zeraTudo: #zera todos as pontuaï¿½ï¿½es
 	addi sp, sp, -4
 	sw  ra, 0(sp)
 	jal ra, zeraL
@@ -112,7 +130,7 @@ zeraL:	#responsavel por zerar L
 zeraBonus: #responsavel por zerar Bonus para bonus inicial -> 5000
 	li a0, END_X_BONUS5000
 	li a1, END_Y_BONUS5000
-	la a2, bonus5000
+	la a2, bonus5000t
 	addi sp, sp, -4
 	sw ra, 0(sp)
 	jal ra, DesenhaTela
@@ -123,7 +141,7 @@ zeraBonus: #responsavel por zerar Bonus para bonus inicial -> 5000
 		
 				
 	
-zeraM:	#responsável por zerar pontuação M
+zeraM:	#responsï¿½vel por zerar pontuaï¿½ï¿½o M
 	li a0, END_X_MZERADOCOMPLETO
 	li a1, END_Y_MZERADOCOMPLETO
 	la a2, Mzeradocompleto
@@ -135,7 +153,7 @@ zeraM:	#responsável por zerar pontuação M
 	ret	
 
 	
-zeraII: #responsável por zerar pontuação II
+zeraII: #responsï¿½vel por zerar pontuaï¿½ï¿½o II
  	li a0, END_X_IIZERADOCOMPLETO
 	li a1, END_Y_IIZERADOCOMPLETO
 	la a2, IIzeradocompleto
@@ -148,7 +166,7 @@ zeraII: #responsável por zerar pontuação II
 	
 		
 				
-zeraI: # responsável por zerar a pontuação I
+zeraI: # responsï¿½vel por zerar a pontuaï¿½ï¿½o I
 	li a0, END_X_IZERADO
 	li a1, END_Y_IZERADO
 	la a2, Izerado
@@ -159,7 +177,7 @@ zeraI: # responsável por zerar a pontuação I
 	addi sp, sp, 4
 	ret
 	
-zeraTop: #responsável por zerar a pontuação Top
+zeraTop: #responsï¿½vel por zerar a pontuaï¿½ï¿½o Top
 	li a0, END_X_TOPZERADO
 	li a1, END_Y_TOPZERADO
 	la a2, Topzerado
@@ -172,11 +190,11 @@ zeraTop: #responsável por zerar a pontuação Top
 	
 
 
-movimenta_princess: 	#os argumentos estão na memória endereco X(fp)
+movimenta_princess: 	#os argumentos estï¿½o na memï¿½ria endereco X(fp)
 # 0(fp) -> x || 4(fp) -> y || 8(fp) -> estado
 # princess vai ter dois estados 
-# 'd' -> pé direito na frente 
-# 'e' -> pé esquerdo na frente
+# 'd' -> pï¿½ direito na frente 
+# 'e' -> pï¿½ esquerdo na frente
 lw t0, 0(s0)
 lw t1, 4(s0)
 lw t2, 8(s0)
@@ -216,7 +234,7 @@ PRINCESS_VAI_PARA_ESTADO_E:
 movimenta_dk: 
 # 12(fp) -> x || 16(fp) -> y || 20(fp) -> state || 24(s0) -> state anterior || 28(s0) -> contador para barril horizontal/vertical
 #dk tem 3 estados com 2 'subestados' -> barrilhorizontal && barrilvertical 
-#há um contador para barris verticais ou horizontais -> se contador%3 == 0 barril vertical, else -> barril horizontal
+#hï¿½ um contador para barris verticais ou horizontais -> se contador%3 == 0 barril vertical, else -> barril horizontal
 	lw a0, 12(s0)
 	lw a1, 16(s0)
 	lw t0, 20(s0)
@@ -228,12 +246,12 @@ movimenta_dk:
 	addi t5, zero, CONST_DK_ESTADO_BARRIL_ESQUERDA
 	addi t6, zero, CONST_DK_ESTADO_BARRIL_CENTRO
 	addi s11, zero, CONST_DK_ESTADO_BARRIL_DIREITA
-	beq	t0, t3, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braço levantado, o próximo estado é com braço abaixado
-	beq	t0, t4, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braço levantado, o próximo estado é com braço abaixado
-	beq	t0, t5, DX_VAI_PARA_BARRILCENTRO	#se estiver com barril esquerda, o proximo é barril centro
+	beq	t0, t3, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braï¿½o levantado, o prï¿½ximo estado ï¿½ com braï¿½o abaixado
+	beq	t0, t4, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braï¿½o levantado, o prï¿½ximo estado ï¿½ com braï¿½o abaixado
+	beq	t0, t5, DX_VAI_PARA_BARRILCENTRO	#se estiver com barril esquerda, o proximo ï¿½ barril centro
 	beq	t0, t6, DX_VAI_PARA_BARRILDIREITA_OU_BRACO_BAIXO	#se estiver com barril centro, decide se o proximo estado e braco baixo ou barril_direita
 	beq	t0, s11, DK_VAI_PARA_BRACO_BAIXO	#se estiver com barril direita, volta pro centro
-	#significa que está no estado com braço baixo, comparar estado anterior para saber o próximo
+	#significa que estï¿½ no estado com braï¿½o baixo, comparar estado anterior para saber o prï¿½ximo
 		beq t1, t3, DK_VAI_PARA_BRACO_ESQUERDO	#se no estado anterior ele estava com braco direito, agora e o braco esquerdo que levanta
 		beq t1, t4, DX_VAI_PARA_BARRILESQUERDA	#se no estado anterior ele estava com braco esquerdo, agora pega barril na esquerda
 			
@@ -248,7 +266,7 @@ movimenta_dk:
 			 addi	s11, zero, CONST_DK_ESTADO_BARRIL_ESQUERDA
 			 sw	t0, 24(s0)
 			 sw	s11, 20(s0)
-			 #a0 e a1 já foram carregados no contexto externo
+			 #a0 e a1 jï¿½ foram carregados no contexto externo
 			 la	a2, macaco_barril_esquerda_ok
 			 addi 	sp, sp, -4
 			 sw	ra, 0(sp)
@@ -271,7 +289,7 @@ movimenta_dk:
 			ret
 			
 			DX_VAI_PARA_BARRILDIREITA_OU_BRACO_BAIXO:
-			#faz rem com contador pra ver se vai para direita com barril ou baixar a mao depois de jogá-lo
+			#faz rem com contador pra ver se vai para direita com barril ou baixar a mao depois de jogï¿½-lo
 			li t6, PROP_BARRIL_VERTICAL_HORIZONTAL
 			rem 	s2, s2, t6
 			beq	s2, zero, DK_VAI_PARA_BRACO_BAIXO #barril vertical
@@ -279,7 +297,7 @@ movimenta_dk:
 			addi	s11, zero, CONST_DK_ESTADO_BARRIL_DIREITA
 			sw	t0, 24(s0)
 			sw	s11, 20(s0)
-			 #a0 e a1 já foram carregados no contexto externo
+			 #a0 e a1 jï¿½ foram carregados no contexto externo
 			la	a2, macaco_barril_direita_ok
 			addi 	sp, sp, -4
 			sw	ra, 0(sp)
@@ -332,12 +350,24 @@ movimenta_dk:
 		addi	sp, sp, 4
 		ret
 	
+PontuaI:
+	lw a1, 56(s0) #Y de I
+	
+	#pontua d0: 
+	lw a0, 32(s0) #Mudar IMM para adaptar para os outros D's
+	la a2, I9
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
 	
 	
 DesenhaTela:
 # a0 - x inicial da imagem
 # a1 - y inicial da imagem
-# a2 - endereco imagem	
+# a2 - endereco imagem
 	li s1,0xFF000000	# Frame0
 	li t0, 320
 	mul t0, t0, a1 		#y inicial
