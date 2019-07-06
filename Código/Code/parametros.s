@@ -26,11 +26,19 @@
 .eqv END_VGA_INICIAL	              0xFF000000
 .eqv END_VGA_FINAL                    0xFF012C00
 
-#parâmetros de personagem
+#parâmetros de personagem - PRINCESS
 
 .eqv CONST_PRINCESS_ESTADO_D			100 # 'd' em decimal ascii
 .eqv CONST_PRINCESS_ESTADO_E			101 # 'e' em decimal ascii
 .eqv CONST_PRINCESS_ENDERECO_X_FASE1			101 
 .eqv CONST_PRINCESS_ENDERECO_Y_FASE1			23 
 
+
+#parâmetros de personagem - DK
+
+.eqv CONST_DK_ESTADO_BRACO_BAIXO			97 # 'a' em decimal ascii
+.eqv CONST_DK_ESTADO_BRACO_DIREITO			98 # 'b' em decimal ascii
+.eqv CONST_DK_ESTADO_BRACO_ESQUERDO			99 # 'c' em decimal ascii
+.eqv CONST_DK_ENDERECO_X_FASE1				40 
+.eqv CONST_DK_ENDERECO_Y_FASE1				33 
 

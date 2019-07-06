@@ -8,6 +8,10 @@
 .include "Lzerado.s"
 .include "princess_pe_direito_ok.s"
 .include "princess_pe_esquerdo_ok.s"
+.include "macaco_braco_baixo_ok.s"
+.include "macaco_braco_esquerdo_ok.s"
+.include "macaco_braco_direito_ok.s"
+
 .include "parametros.s"
 
 
@@ -17,23 +21,40 @@
 
 jal ra, Phase1
 jal ra, zeraTudo
+jal ra, setValoresIniciais
+jal ra, movimenta_dk
 
 
-li t0, CONST_PRINCESS_ENDERECO_X_FASE1
-li t1, CONST_PRINCESS_ENDERECO_Y_FASE1
-li t2, CONST_PRINCESS_ESTADO_D
-mv s0, sp
-addi sp, sp, -12	#atualização do valor de sp para nao mexer nos 12 bytes da princess
-sw t0, 0(s0)
-sw t1, 4(s0)
-sw t2, 8(s0)
-jal ra, movimenta_princess
 li a7, 10
 ecall
 
 
 
 
+
+setValoresIniciais:
+
+	#Seta Valores Iniciais PRINCESS
+	li t0, CONST_PRINCESS_ENDERECO_X_FASE1
+	li t1, CONST_PRINCESS_ENDERECO_Y_FASE1
+	li t2, CONST_PRINCESS_ESTADO_D
+	mv s0, sp
+	sw t0, 0(s0)
+	sw t1, 4(s0)
+	sw t2, 8(s0)
+	#jal ra, movimenta_princess
+	####---------------------###
+	
+	#Seta Valores Iniciais DK
+	li t0, CONST_DK_ENDERECO_X_FASE1
+	li t1, CONST_DK_ENDERECO_Y_FASE1
+	li t2, CONST_DK_ESTADO_BRACO_ESQUERDO
+	li t3, CONST_DK_ESTADO_BRACO_BAIXO
+	sw t0, 12(s0)
+	sw t1, 16(s0)
+	sw t2, 20(s0)
+	sw t3, 24(s0)
+	ret
 
 
 Phase1:
@@ -145,7 +166,7 @@ zeraTop: #responsável por zerar a pontuação Top
 	
 
 
-movimenta_princess: 	#os argumentos estão na memória endereco 0(fp)
+movimenta_princess: 	#os argumentos estão na memória endereco X(fp)
 # 0(fp) -> x || 4(fp) -> y || 8(fp) -> estado
 # princess vai ter dois estados 
 # 'd' -> pé direito na frente 
@@ -158,7 +179,18 @@ lw t2, 8(s0)
 addi	t3, zero, CONST_PRINCESS_ESTADO_D 
 beq	t2, t3, PRINCESS_VAI_PARA_ESTADO_E
 #aqui significa que ta no estado 'e', portanto atualizar para estado 'd'
-ret
+addi t3, zero, CONST_PRINCESS_ESTADO_D
+	sw t3, 8(s0)
+	#desenha princess no estado 'd'
+	mv a0, t0
+	mv a1, t1
+	la a2, princess_pe_direito_ok
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
 
 PRINCESS_VAI_PARA_ESTADO_E:
 	addi t3, zero, CONST_PRINCESS_ESTADO_E
@@ -176,20 +208,71 @@ PRINCESS_VAI_PARA_ESTADO_E:
 
 
 movimenta_dk: 
-# 12(fp) -> x 
-
-
-
-
+# 12(fp) -> x || 16(fp) -> y || 20(fp) -> state || 24(s0) -> state anterior || 28(s0) -> contador para barril horizontal/vertical
+#dk tem 3 estados inicialmente 
+	lw a0, 12(s0)
+	lw a1, 16(s0)
+	lw t0, 20(s0)
+	lw t1, 24(s0)
+	addi t2, zero, CONST_DK_ESTADO_BRACO_BAIXO
+	addi t3, zero, CONST_DK_ESTADO_BRACO_DIREITO
+	addi t4, zero, CONST_DK_ESTADO_BRACO_ESQUERDO
+	beq	t0, t3, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braço levantado, o próximo estado é com braço abaixado
+	beq	t0, t4, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braço levantado, o próximo estado é com braço abaixado
+	#significa que está no estado com braço baixo, comparar estado anterior para saber o próximo
+		beq t1, t3, DK_VAI_PARA_BRACO_ESQUERDO	#se no estado anterior ele estava com braco direito, agora e o braco esquerdo que levanta
+		beq t1, t4, DK_VAI_PARA_BRACO_DIREITO	#se no estado anterior ele estava com braco esquerdo, agora e o braco direito que levanta
+			#falta tratamento de erro, caso seja um caractere desconhecido
+			ret
+		
+		DK_VAI_PARA_BRACO_ESQUERDO:
+			
+			sw	t4, 20(s0)	#atualiza o state
+			sw	t0, 24(s0)	#atualiza o state anterior
+			#a0 e a1 ja foram carregados anteriormente
+			la	a2, macaco_braco_esquerdo_ok
+			addi	sp, sp, -4
+			sw	ra, 0(sp)
+			jal	ra, DesenhaTela
+			lw	ra, 0(sp)
+			addi	sp, sp, 4
+			ret
+			
+		
+		DK_VAI_PARA_BRACO_DIREITO:
+		
+			sw	t3, 20(s0)	#atualiza o state
+			sw	t0, 24(s0)	#atualiza o state anterior
+			#a0 e a1 ja foram carregados anteriormente
+			la	a2, macaco_braco_direito_ok
+			addi	sp, sp, -4
+			sw	ra, 0(sp)
+			jal	ra, DesenhaTela
+			lw	ra, 0(sp)
+			addi	sp, sp, 4
+			ret
 		
 	
 	
+	DK_VAI_PARA_BRACO_BAIXO:
+	
+		sw	t2, 20(s0)	#atualiza o state
+		sw	t0, 24(s0)	#atualiza o state anterior
+		#a0 e a1 ja foram carregados anteriormente
+		la	a2, macaco_braco_baixo_ok
+		addi	sp, sp, -4
+		sw	ra, 0(sp)
+		jal	ra, DesenhaTela
+		lw	ra, 0(sp)
+		addi	sp, sp, 4
+		ret
+	
+	
+	
+DesenhaTela:
 # a0 - x inicial da imagem
 # a1 - y inicial da imagem
-# a2 - endereco imagem
-
-
-DesenhaTela:	
+# a2 - endereco imagem	
 	li s1,0xFF000000	# Frame0
 	li t0, 320
 	mul t0, t0, a1 		#y inicial
