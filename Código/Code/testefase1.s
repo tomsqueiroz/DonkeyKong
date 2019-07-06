@@ -14,9 +14,20 @@
 
 #Alterar valor de sp para passar da memória do controle do jogo posicoes e status
 
+jal ra, Phase1
+jal ra, zeraTudo
+li a7, 10
+ecall
+
+
+
+
+
+
+Phase1:
 # Carrega a imagem1
-FORA:	li t1,0xFF000000	# endereco inicial da Memoria VGA
-	li t2,0xFF012C00	# endereco final 
+FORA:	li t1,END_VGA_INICIAL	# endereco inicial da Memoria VGA
+	li t2,END_VGA_FINAL	# endereco final 
 	la s1,Fase1		# endereï¿½o dos dados da tela na memoria
 	addi s1,s1,8		# primeiro pixels depois das informaï¿½ï¿½es de nlin ncol
 LOOP1: 	beq t1,t2,FIM		# Se for o ï¿½ltimo endereï¿½o entï¿½o sai do loop
@@ -27,16 +38,23 @@ LOOP1: 	beq t1,t2,FIM		# Se for o ï¿½ltimo endereï¿½o entï¿½o sai do loop
 	j LOOP1			# volta a verificar
 	
 	
-# devolve o controle ao sistema operacional
-FIM:	jal ra, zeraL
+
+FIM:	ret
+
+zeraTudo: #zera todos as pontuações
+	addi sp, sp, -4
+	sw  ra, 0(sp)
+	jal ra, zeraL
 	jal ra, zeraBonus
 	jal ra, zeraM
 	jal ra, zeraII
 	jal ra, zeraI
 	jal ra, zeraI
 	jal ra, zeraTop
-	li a7, 10
-	ecall
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret	
+
 	
 zeraL:	#responsavel por zerar L
 	li a0, END_X_LZERADO

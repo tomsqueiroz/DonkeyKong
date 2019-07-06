@@ -2,7 +2,7 @@
 
 
 
-
+## parâmetros para zerar###
 .eqv END_X_TOPZERADO          160
 .eqv END_Y_TOPZERADO          22
 
@@ -20,3 +20,12 @@
 
 .eqv END_X_LZERADO	            280
 .eqv END_Y_LZERADO                  39
+
+## parâmetros de tela
+
+.eqv END_VGA_INICIAL	              0xFF000000
+.eqv END_VGA_FINAL                    0xFF012C00
+
+#parâmetros de personagem
+
+
