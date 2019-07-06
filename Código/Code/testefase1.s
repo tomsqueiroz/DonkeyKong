@@ -7,6 +7,7 @@
 .include "bonus5000.s"
 .include "Lzerado.s"
 .include "princess_pe_direito_ok.s"
+.include "princess_pe_esquerdo_ok.s"
 .include "parametros.s"
 
 
@@ -16,6 +17,17 @@
 
 jal ra, Phase1
 jal ra, zeraTudo
+
+
+li t0, CONST_PRINCESS_ENDERECO_X_FASE1
+li t1, CONST_PRINCESS_ENDERECO_Y_FASE1
+li t2, CONST_PRINCESS_ESTADO_D
+mv s0, sp
+addi sp, sp, -12
+sw t0, 0(s0)
+sw t1, 4(s0)
+sw t2, 8(s0)
+jal ra, movimenta_princess
 li a7, 10
 ecall
 
@@ -138,9 +150,29 @@ movimenta_princess: 	#os argumentos estão na memória endereco 0(fp)
 # princess vai ter dois estados 
 # 'd' -> pé direito na frente 
 # 'e' -> pé esquerdo na frente
+lw t0, 0(s0)
+lw t1, 4(s0)
+lw t2, 8(s0)
 
+#se princess estiver estado d, muda para estado 'e' e atualiza na memoria
+addi	t3, zero, CONST_PRINCESS_ESTADO_D 
+beq	t2, t3, PRINCESS_VAI_PARA_ESTADO_E
+#aqui significa que ta no estado 'e', portanto atualizar para estado 'd'
+ret
 
-
+PRINCESS_VAI_PARA_ESTADO_E:
+	addi t3, zero, CONST_PRINCESS_ESTADO_E
+	sw t3, 0(s0)
+	#desenha princess no estado 'e'
+	mv a0, t0
+	mv a1, t1
+	la a2, princess_pe_esquerdo_ok
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
 
 
 movimenta_dk: 
@@ -158,11 +190,11 @@ movimenta_dk:
 
 
 DesenhaTela:	
-	li s0,0xFF000000	# Frame0
+	li s1,0xFF000000	# Frame0
 	li t0, 320
 	mul t0, t0, a1 		#y inicial
 	add t0, t0, a0		
-	add s0, s0, t0
+	add s1, s1, t0
 	mv t0, a2		# endereï¿½o da imagem
 	lw t1,0(t0)		# Numero de x
 	lw t2,4(t0)		# numero de y
@@ -172,15 +204,15 @@ DesenhaTela:
 LOOPY: 	beq t4,t2,FORAY	
 LOOPX:	beq t3,t1,FORAX			
 		lb t5,0(t0)
-		sb t5,0(s0)
+		sb t5,0(s1)
 		addi t0,t0,1
-		addi s0,s0,1 
+		addi s1,s1,1 
 		addi t3, t3, 1
 		j LOOPX
 FORAX:
 	li t3, 0
-	sub s0, s0, t1
-	addi s0, s0, 320
+	sub s1, s1, t1
+	addi s1, s1, 320
 	addi t4, t4, 1
 	j LOOPY
 FORAY:	ret

@@ -28,4 +28,9 @@
 
 #parâmetros de personagem
 
+.eqv CONST_PRINCESS_ESTADO_D			100 # 'd' em decimal ascii
+.eqv CONST_PRINCESS_ESTADO_E			101 # 'e' em decimal ascii
+.eqv CONST_PRINCESS_ENDERECO_X_FASE1			101 
+.eqv CONST_PRINCESS_ENDERECO_Y_FASE1			23 
+
 
