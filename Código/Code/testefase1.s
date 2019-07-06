@@ -23,7 +23,7 @@ li t0, CONST_PRINCESS_ENDERECO_X_FASE1
 li t1, CONST_PRINCESS_ENDERECO_Y_FASE1
 li t2, CONST_PRINCESS_ESTADO_D
 mv s0, sp
-addi sp, sp, -12
+addi sp, sp, -12	#atualização do valor de sp para nao mexer nos 12 bytes da princess
 sw t0, 0(s0)
 sw t1, 4(s0)
 sw t2, 8(s0)
@@ -162,7 +162,7 @@ ret
 
 PRINCESS_VAI_PARA_ESTADO_E:
 	addi t3, zero, CONST_PRINCESS_ESTADO_E
-	sw t3, 0(s0)
+	sw t3, 8(s0)
 	#desenha princess no estado 'e'
 	mv a0, t0
 	mv a1, t1
