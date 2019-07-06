@@ -1,11 +1,18 @@
 .data
 .include "Fase1.s"
+.include "Izerado.s"
+.include "IIzeradocompleto.s"
+.include "Topzerado.s"
+.include "Mzeradocompleto.s"
+.include "bonus5000.s"
+.include "Lzerado.s"
+.include "princess_pe_direito_ok.s"
 .include "113.s"
 
 
 .text
 
-
+#Alterar valor de sp para passar da memória do controle do jogo posicoes e status
 
 # Carrega a imagem1
 FORA:	li t1,0xFF000000	# endereco inicial da Memoria VGA
@@ -21,9 +28,111 @@ LOOP1: 	beq t1,t2,FIM		# Se for o ï¿½ltimo endereï¿½o entï¿½o sai do loop
 	
 	
 # devolve o controle ao sistema operacional
-FIM:	jal ra, DesenhaTela
+FIM:	jal ra, zeraL
+	jal ra, zeraBonus
+	jal ra, zeraM
+	jal ra, zeraII
+	jal ra, zeraI
+	jal ra, zeraI
+	jal ra, zeraTop
 	li a7, 10
 	ecall
+	
+zeraL:	#responsavel por zerar L
+	li a0, 280
+	li a1, 39
+	la a2, Lzerado
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+
+
+
+zeraBonus: #responsavel por zerar Bonus para bonus inicial -> 5000
+	li a0, 230
+	li a1, 38
+	la a2, bonus5000
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+		
+				
+	
+zeraM:	#responsável por zerar pontuação M
+	li a0, 210
+	li a1, 39
+	la a2, Mzeradocompleto
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret	
+
+	
+zeraII: #responsável por zerar pontuação II
+ 	li a0, 241
+	li a1, 23
+	la a2, IIzeradocompleto
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+	
+		
+				
+zeraI: # responsável por zerar a pontuação I
+	li a0, 40
+	li a1, 23
+	la a2, Izerado
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+	
+zeraTop: #responsável por zerar a pontuação Top
+	li a0, 160
+	li a1, 22
+	la a2, Topzerado
+	addi sp, sp, -4
+	sw ra, 0(sp)
+	jal ra, DesenhaTela
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+	
+
+
+movimenta_princess: 	#os argumentos estão na memória endereco 0(fp)
+# 0(fp) -> x || 4(fp) -> y || 8(fp) -> estado
+# princess vai ter dois estados 
+# 'd' -> pé direito na frente 
+# 'e' -> pé esquerdo na frente
+
+
+
+
+
+movimenta_dk: 
+# 12(fp) -> x 
+
+
+
+
+		
+	
 	
 # a0 - x inicial da imagem
 # a1 - y inicial da imagem
@@ -31,9 +140,6 @@ FIM:	jal ra, DesenhaTela
 
 
 DesenhaTela:	
-	li a0, 101
-	li a1, 23
-	la a2, barril
 	li s0,0xFF000000	# Frame0
 	li t0, 320
 	mul t0, t0, a1 		#y inicial
