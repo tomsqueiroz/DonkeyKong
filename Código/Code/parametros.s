@@ -1,5 +1,9 @@
 ####PARÂMETROS ESTÁTICOS DO JOGO - DONKEY KONG######
 
+#CONFIGURACÕES DO JOGO
+#numero de barris verticais por barris horizontais
+.eqv PROP_BARRIL_VERTICAL_HORIZONTAL 	3
+
 
 
 ## parâmetros para zerar###
@@ -39,6 +43,9 @@
 .eqv CONST_DK_ESTADO_BRACO_BAIXO			97 # 'a' em decimal ascii
 .eqv CONST_DK_ESTADO_BRACO_DIREITO			98 # 'b' em decimal ascii
 .eqv CONST_DK_ESTADO_BRACO_ESQUERDO			99 # 'c' em decimal ascii
+.eqv CONST_DK_ESTADO_BARRIL_ESQUERDA			100 # 'd' em decimal ascii
+.eqv CONST_DK_ESTADO_BARRIL_CENTRO			101 # 'e' em decimal ascii
+.eqv CONST_DK_ESTADO_BARRIL_DIREITA			102 # 'f' em decimal ascii
 .eqv CONST_DK_ENDERECO_X_FASE1				40 
 .eqv CONST_DK_ENDERECO_Y_FASE1				33 
 

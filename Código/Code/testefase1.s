@@ -11,6 +11,9 @@
 .include "macaco_braco_baixo_ok.s"
 .include "macaco_braco_esquerdo_ok.s"
 .include "macaco_braco_direito_ok.s"
+.include "macaco_barril_esquerda_ok.s"
+.include "macaco_barril_centro_ok.s"
+.include "macaco_barril_direita_ok.s"
 
 .include "parametros.s"
 
@@ -22,8 +25,9 @@
 jal ra, Phase1
 jal ra, zeraTudo
 jal ra, setValoresIniciais
-jal ra, movimenta_dk
 
+LOOP_MOVIMENTA_DK: jal ra, movimenta_dk
+j LOOP_MOVIMENTA_DK
 
 li a7, 10
 ecall
@@ -39,21 +43,23 @@ setValoresIniciais:
 	li t1, CONST_PRINCESS_ENDERECO_Y_FASE1
 	li t2, CONST_PRINCESS_ESTADO_D
 	mv s0, sp
-	sw t0, 0(s0)
-	sw t1, 4(s0)
-	sw t2, 8(s0)
+	sw t0, 0(s0)	#coordenada X
+	sw t1, 4(s0)	#coordenada Y
+	sw t2, 8(s0)	#state
 	#jal ra, movimenta_princess
 	####---------------------###
 	
 	#Seta Valores Iniciais DK
 	li t0, CONST_DK_ENDERECO_X_FASE1
 	li t1, CONST_DK_ENDERECO_Y_FASE1
-	li t2, CONST_DK_ESTADO_BRACO_ESQUERDO
+	li t2, CONST_DK_ESTADO_BRACO_DIREITO
 	li t3, CONST_DK_ESTADO_BRACO_BAIXO
+	li t4, 0
 	sw t0, 12(s0)
 	sw t1, 16(s0)
 	sw t2, 20(s0)
 	sw t3, 24(s0)
+	sw t4, 28(s0)
 	ret
 
 
@@ -209,21 +215,80 @@ PRINCESS_VAI_PARA_ESTADO_E:
 
 movimenta_dk: 
 # 12(fp) -> x || 16(fp) -> y || 20(fp) -> state || 24(s0) -> state anterior || 28(s0) -> contador para barril horizontal/vertical
-#dk tem 3 estados inicialmente 
+#dk tem 3 estados com 2 'subestados' -> barrilhorizontal && barrilvertical 
+#há um contador para barris verticais ou horizontais -> se contador%3 == 0 barril vertical, else -> barril horizontal
 	lw a0, 12(s0)
 	lw a1, 16(s0)
 	lw t0, 20(s0)
 	lw t1, 24(s0)
+	lw s2, 28(s0)
 	addi t2, zero, CONST_DK_ESTADO_BRACO_BAIXO
 	addi t3, zero, CONST_DK_ESTADO_BRACO_DIREITO
 	addi t4, zero, CONST_DK_ESTADO_BRACO_ESQUERDO
+	addi t5, zero, CONST_DK_ESTADO_BARRIL_ESQUERDA
+	addi t6, zero, CONST_DK_ESTADO_BARRIL_CENTRO
+	addi s11, zero, CONST_DK_ESTADO_BARRIL_DIREITA
 	beq	t0, t3, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braço levantado, o próximo estado é com braço abaixado
 	beq	t0, t4, DK_VAI_PARA_BRACO_BAIXO		#se estiver com algum braço levantado, o próximo estado é com braço abaixado
+	beq	t0, t5, DX_VAI_PARA_BARRILCENTRO	#se estiver com barril esquerda, o proximo é barril centro
+	beq	t0, t6, DX_VAI_PARA_BARRILDIREITA_OU_BRACO_BAIXO	#se estiver com barril centro, decide se o proximo estado e braco baixo ou barril_direita
+	beq	t0, s11, DK_VAI_PARA_BRACO_BAIXO	#se estiver com barril direita, volta pro centro
 	#significa que está no estado com braço baixo, comparar estado anterior para saber o próximo
 		beq t1, t3, DK_VAI_PARA_BRACO_ESQUERDO	#se no estado anterior ele estava com braco direito, agora e o braco esquerdo que levanta
-		beq t1, t4, DK_VAI_PARA_BRACO_DIREITO	#se no estado anterior ele estava com braco esquerdo, agora e o braco direito que levanta
-			#falta tratamento de erro, caso seja um caractere desconhecido
+		beq t1, t4, DX_VAI_PARA_BARRILESQUERDA	#se no estado anterior ele estava com braco esquerdo, agora pega barril na esquerda
+			
+			#se o anterior nao for braco esquerdo nem direito, significa que tava jogando barril
+			j DK_VAI_PARA_BRACO_DIREITO
 			ret
+					 
+			 DX_VAI_PARA_BARRILESQUERDA:
+			 #incrementar o contador do barril 
+			 addi	s2, s2, 1
+			 sw	s2, 28(s0)
+			 addi	s11, zero, CONST_DK_ESTADO_BARRIL_ESQUERDA
+			 sw	t0, 24(s0)
+			 sw	s11, 20(s0)
+			 #a0 e a1 já foram carregados no contexto externo
+			 la	a2, macaco_barril_esquerda_ok
+			 addi 	sp, sp, -4
+			 sw	ra, 0(sp)
+			 jal DesenhaTela
+			 lw 	ra, 0(sp)
+			 addi	sp, sp, 4
+			 ret
+		
+			DX_VAI_PARA_BARRILCENTRO:
+			addi	s11, zero, CONST_DK_ESTADO_BARRIL_CENTRO
+			sw	t0, 24(s0)	#salva state anterior 
+			sw	s11, 20(s0)	#salva state atual
+			#a0 e a1 ja foram carregados no contexto externo
+			la	a2, macaco_barril_centro_ok
+			addi 	sp, sp, -4
+			sw	ra, 0(sp)
+			jal DesenhaTela
+			lw 	ra, 0(sp)
+			addi	sp, sp, 4
+			ret
+			
+			DX_VAI_PARA_BARRILDIREITA_OU_BRACO_BAIXO:
+			#faz rem com contador pra ver se vai para direita com barril ou baixar a mao depois de jogá-lo
+			li t6, PROP_BARRIL_VERTICAL_HORIZONTAL
+			rem 	s2, s2, t6
+			beq	s2, zero, DK_VAI_PARA_BRACO_BAIXO #barril vertical
+			#significa barril horizontal
+			addi	s11, zero, CONST_DK_ESTADO_BARRIL_DIREITA
+			sw	t0, 24(s0)
+			sw	s11, 20(s0)
+			 #a0 e a1 já foram carregados no contexto externo
+			la	a2, macaco_barril_direita_ok
+			addi 	sp, sp, -4
+			sw	ra, 0(sp)
+			jal DesenhaTela
+			lw 	ra, 0(sp)
+			addi	sp, sp, 4
+			ret
+			 
+		
 		
 		DK_VAI_PARA_BRACO_ESQUERDO:
 			
