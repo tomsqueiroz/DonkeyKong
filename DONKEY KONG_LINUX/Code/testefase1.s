@@ -7,7 +7,7 @@
 .include "bonus5000.s"
 .include "Lzerado.s"
 .include "princess_pe_direito_ok.s"
-.include "113.s"
+.include "parametros.s"
 
 
 .text
@@ -39,8 +39,8 @@ FIM:	jal ra, zeraL
 	ecall
 	
 zeraL:	#responsavel por zerar L
-	li a0, 280
-	li a1, 39
+	li a0, END_X_LZERADO
+	li a1, END_Y_LZERADO
 	la a2, Lzerado
 	addi sp, sp, -4
 	sw ra, 0(sp)
@@ -53,8 +53,8 @@ zeraL:	#responsavel por zerar L
 
 
 zeraBonus: #responsavel por zerar Bonus para bonus inicial -> 5000
-	li a0, 230
-	li a1, 38
+	li a0, END_X_BONUS5000
+	li a1, END_Y_BONUS5000
 	la a2, bonus5000
 	addi sp, sp, -4
 	sw ra, 0(sp)
@@ -67,8 +67,8 @@ zeraBonus: #responsavel por zerar Bonus para bonus inicial -> 5000
 				
 	
 zeraM:	#responsável por zerar pontuação M
-	li a0, 210
-	li a1, 39
+	li a0, END_X_MZERADOCOMPLETO
+	li a1, END_Y_MZERADOCOMPLETO
 	la a2, Mzeradocompleto
 	addi sp, sp, -4
 	sw ra, 0(sp)
@@ -79,8 +79,8 @@ zeraM:	#responsável por zerar pontuação M
 
 	
 zeraII: #responsável por zerar pontuação II
- 	li a0, 241
-	li a1, 23
+ 	li a0, END_X_IIZERADOCOMPLETO
+	li a1, END_Y_IIZERADOCOMPLETO
 	la a2, IIzeradocompleto
 	addi sp, sp, -4
 	sw ra, 0(sp)
@@ -92,8 +92,8 @@ zeraII: #responsável por zerar pontuação II
 		
 				
 zeraI: # responsável por zerar a pontuação I
-	li a0, 40
-	li a1, 23
+	li a0, END_X_IZERADO
+	li a1, END_Y_IZERADO
 	la a2, Izerado
 	addi sp, sp, -4
 	sw ra, 0(sp)
@@ -103,8 +103,8 @@ zeraI: # responsável por zerar a pontuação I
 	ret
 	
 zeraTop: #responsável por zerar a pontuação Top
-	li a0, 160
-	li a1, 22
+	li a0, END_X_TOPZERADO
+	li a1, END_Y_TOPZERADO
 	la a2, Topzerado
 	addi sp, sp, -4
 	sw ra, 0(sp)
