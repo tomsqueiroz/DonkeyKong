@@ -1,8 +1,6 @@
 .data
 
 .text
-##INCLUDES CONFIGURACOES##
-
 
 controlePosicaoMario:
 # mario vai ter 60(s0) -> x || 64(s0) -> y || 68(s0) -> state || 72(s0) -> state anterior ||  76(s0) -> em que degrau está || 80(s0) -> input usuario 			
@@ -19,25 +17,25 @@ controlePosicaoMario:
 		
 		#teste de input - cima
 		li	t6, CONST_INPUT_CIMA
-		beq	t5, t6, INPUT_CIMA
+		beq	t5, t6, INPUT_CIMA_POSICAO
 		
 		#teste de input - baixo
 		li	t6, CONST_INPUT_BAIXO
-		beq	t5, t6, INPUT_BAIXO
+		beq	t5, t6, INPUT_BAIXO_POSICAO
 						
 		#teste de input - esquerda
 		li	t6, CONST_INPUT_ESQUERDA
-		beq	t5, t6, INPUT_ESQUERDA			
+		beq	t5, t6, INPUT_ESQUERDA_POSICAO			
 		
 		#teste de input - cima
 		li	t6, CONST_INPUT_DIREITA
-		beq	t5, t6, INPUT_DIREITA
+		beq	t5, t6, INPUT_DIREITA_POSICAO
 		
 		#teste de input - espaco
 		li	t6, CONST_INPUT_ESPACO
-		#beq	t5, t6, INPUT_ESPACO
+		#beq	t5, t6, INPUT_ESPACO_POSICAO
 	
-		INPUT_CIMA:
+		INPUT_CIMA_POSICAO:
 			#condicao se não estiver em uma escada, não mexer mario
 			li	s1, CONST_MARIO_ESTADO_ESCADA1
 			bne	t2, s1, NAO_ALTERA_POSICAO_MARIO
@@ -54,7 +52,7 @@ controlePosicaoMario:
 			
 	
 		
-		INPUT_BAIXO:
+		INPUT_BAIXO_POSICAO:
 			#condicao se não estiver em uma escada, não mexer mario
 			li	s1, CONST_MARIO_ESTADO_ESCADA1
 			bne	t2, s1, NAO_ALTERA_POSICAO_MARIO
@@ -76,7 +74,7 @@ controlePosicaoMario:
 	
 	
 	
-		INPUT_ESQUERDA: 
+		INPUT_ESQUERDA_POSICAO: 
 			
 
 			#condicao se estiver em uma escada para nao mexer se receber input_direita
@@ -137,7 +135,7 @@ controlePosicaoMario:
 							
 		
 		
-		INPUT_DIREITA:
+		INPUT_DIREITA_POSICAO:
 			#condicao se estiver em uma escada para nao mexer se receber input_direita
 			li	s1, CONST_MARIO_ESTADO_ESCADA1
 			beq	t2, s1, NAO_ALTERA_POSICAO_MARIO

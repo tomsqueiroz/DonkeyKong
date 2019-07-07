@@ -18,7 +18,7 @@
 
 ##INCLUDES CONFIGURACOES##
 .include "parametros.s"
-.include "controle_posicao_mario.asm"
+
 
 .text
 
@@ -28,8 +28,15 @@ jal ra, Phase1
 jal ra, zeraTudo
 jal ra, setValoresIniciais
 
-LOOP_MOVIMENTA_DK: jal ra, movimenta_dk
-j LOOP_MOVIMENTA_DK
+LOOP_PRINCIPAL: 	
+		   li  t0, CONST_END_MEMORIA_TECLADO
+		   lw  t1, 0(t0)
+		   sw  zero, 0(t0)
+		   sw  t1, 80(s0)
+ 		   jal ra, movimenta_dk
+		   jal ra, controlePosicaoMario
+   		   jal ra, controle_estado_mario
+j LOOP_PRINCIPAL
 
 li a7, 10
 ecall
@@ -70,8 +77,8 @@ setValoresIniciais:
 	#Seta Valores Iniciais MARIO
 	li t0, CONST_MARIO_ENDERECO_X_INICIAL_FASE1
 	li t1, CONST_MARIO_ENDERECO_Y_INICIAL_FASE1
-	li t2, CONST_DK_ESTADO_BRACO_DIREITO
-	li t3, CONST_DK_ESTADO_BRACO_BAIXO
+	li t2, CONST_MARIO_PARADO_DIREITA
+	li t3, CONST_MARIO_PARADO_DIREITA
 	li t4, 0
 	li t5, 0	
 	sw t0, 60(s0)
@@ -390,4 +397,7 @@ FORAX:
 	j LOOPY
 FORAY:	ret
 
+
+.include "controle_posicao_mario.asm"
+.include "controle_estado_mario.s"
 
