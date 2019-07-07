@@ -79,8 +79,8 @@ setValoresIniciais:
 	li t1, CONST_MARIO_ENDERECO_Y_INICIAL_FASE1
 	li t2, CONST_MARIO_PARADO_DIREITA
 	li t3, CONST_MARIO_PARADO_DIREITA
-	li t4, 0
-	li t5, 0	
+	li t4, 1
+	li t5, 100	
 	sw t0, 60(s0)
 	sw t1, 64(s0)
 	sw t2, 68(s0)

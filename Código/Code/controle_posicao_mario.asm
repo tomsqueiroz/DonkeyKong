@@ -35,6 +35,8 @@ controlePosicaoMario:
 		li	t6, CONST_INPUT_ESPACO
 		#beq	t5, t6, INPUT_ESPACO_POSICAO
 	
+		ret 
+		
 		INPUT_CIMA_POSICAO:
 			#condicao se não estiver em uma escada, não mexer mario
 			li	s1, CONST_MARIO_ESTADO_ESCADA1

@@ -45,6 +45,8 @@ controle_estado_mario:
 		li	t6, CONST_INPUT_ESPACO
 		#beq	t5, t6, INPUT_ESPACO_ESTADO
 		
+		ret
+		
 		INPUT_CIMA_ESTADO:
 		
 			#testes para ver se está em uma escada	---------- altura 1 ----------#
