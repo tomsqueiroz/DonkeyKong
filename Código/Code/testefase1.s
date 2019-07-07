@@ -14,8 +14,11 @@
 .include "macaco_barril_esquerda_ok.s"
 .include "macaco_barril_centro_ok.s"
 .include "macaco_barril_direita_ok.s"
-.include "parametros.s"
 
+
+##INCLUDES CONFIGURACOES##
+.include "parametros.s"
+.include "controle_posicao_mario.asm"
 
 .text
 
@@ -353,142 +356,7 @@ movimenta_dk:
 		ret
 
 	
-controlePosicaoMario:
-# mario vai ter 60(s0) -> x || 64(s0) -> y || 68(s0) -> state || 72(s0) -> state anterior ||  76(s0) -> em que degrau está || 80(s0) -> input usuario			
-		
-		lw	t0, 60(s0)	#posicao X
-		lw	t1, 64(s0)	#posicao Y
-		lw	t2, 68(s0)	#state
-		lw	t3, 72(s0)	#state_anterior
-		lw	t4, 76(s0)	#altura
-		lw	t5, 80(s0)	#input_usuario
-		
-		#falta fazer teste de altura 1
-		
-		
-		#teste de input - cima
-		li	t6, CONST_INPUT_CIMA
-	#	beq	t5, t6, INPUT_CIMA
-		
-		#teste de input - baixo
-		li	t6, CONST_INPUT_BAIXO
-	#	beq	t5, t6, INPUT_BAIXO
-						
-		#teste de input - esquerda
-		li	t6, CONST_INPUT_ESQUERDA
-	#	beq	t5, t6, INPUT_ESQUERDA			
-		
-		#teste de input - cima
-		li	t6, CONST_INPUT_DIREITA
-		beq	t5, t6, INPUT_DIREITA
-		
-		#teste de input - espaco
-		li	t6, CONST_INPUT_ESPACO
-	#	beq	t5, t6, INPUT_ESPACO
-		INPUT_ESQUERDA: 
-			li	s2, END_X_ALTURA1_FASE1_MIN
-			addi	s1, t0, -CONST_INCREMENTO_POR_INPUT
 
-			#condicao se estiver em uma escada para nao mexer se receber input_direita
-
-			blt	s1, s2, NAO_ALTERA_POSICAO_MARIO	#se x-inc < Fase-min nao alera posicao do mario	
-				#altera posicao da coordenada x
-				sw	s1, 60(s0)	#s1 possui valor de t0 menos incremento
-				li	s1, END_Y_ALTURA1_FASE1_MAX
-				bgt 	t4, s1, NAO_ALTERA_POSICAO_MARIO	#se for maior que 187, significa que nao esta pulando
-					#aqui significa que está pulando
-					
-					li	t0, CONST_MARIO_ESTADO_2
-					beq	t2, t0, ESQUERDA_INCREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_3
-					beq	t2, t0, ESQUERDA_INCREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_4
-					beq	t2, t0, ESQUERDA_INCREMENT_MARIO_Y
-					
-					#ta descendo, entao diminui y
-					
-					li	t0, CONST_MARIO_ESTADO_5
-					beq	t2, t0, ESQUERDA_DECREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_6
-					beq	t2, t0, ESQUERDA_DECREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_7
-					beq	t2, t0, ESQUERDA_DECREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_8
-					beq	t2, t0, ESQUERDA_DECREMENT_MARIO_Y
-					
-					ret
-					
-					ESQUERDA_INCREMENT_MARIO_Y:
-						
-						addi	t1, t1, CONST_MARIO_CONTROLE_PIXEL_P_CICLO
-						#altera incrementa coordenada y
-						sw	t1, 64(s0) 
-						ret
-						
-					ESQUERDA_DECREMENT_MARIO_Y:
-						addi	t1, t1, -CONST_MARIO_CONTROLE_PIXEL_P_CICLO
-						#altera incrementa coordenada y
-						sw	t1, 64(s0) 
-						ret
-							
-		
-		
-		INPUT_DIREITA:
-			li	s2, END_X_ALTURA1_FASE1_MAX
-			addi	s1, t0, CONST_INCREMENTO_POR_INPUT
-				
-			bge	s1, s2, NAO_ALTERA_POSICAO_MARIO	#se x + incr > X max_ altura1 nao adiciona posicao	
-				#altera posicao da coordenada x
-				sw	s1, 60(s0)	#s1 possui valor de t0 mais incremento
-				li	s1, END_Y_ALTURA1_FASE1_MAX
-				bgt 	t4, s1, NAO_ALTERA_POSICAO_MARIO	#se for maior que 187, significa que nao esta pulando
-					#aqui significa que está pulando
-					
-					li	t0, CONST_MARIO_ESTADO_2
-					beq	t2, t0, INCREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_3
-					beq	t2, t0, INCREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_4
-					beq	t2, t0, INCREMENT_MARIO_Y
-					
-					#ta descendo, entao diminui y
-					
-					li	t0, CONST_MARIO_ESTADO_5
-					beq	t2, t0, DECREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_6
-					beq	t2, t0, DECREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_7
-					beq	t2, t0, DECREMENT_MARIO_Y
-					
-					li	t0, CONST_MARIO_ESTADO_8
-					beq	t2, t0, DECREMENT_MARIO_Y
-					
-					
-					INCREMENT_MARIO_Y:
-						
-						addi	t1, t1, CONST_MARIO_CONTROLE_PIXEL_P_CICLO
-						#altera incrementa coordenada y
-						sw	t1, 64(s0) 
-						ret
-						
-					DECREMENT_MARIO_Y:
-						addi	t1, t1, -CONST_MARIO_CONTROLE_PIXEL_P_CICLO
-						#altera incrementa coordenada y
-						sw	t1, 64(s0) 
-						ret
-					
-											
-			NAO_ALTERA_POSICAO_MARIO:														
-			ret
 	
 	
 DesenhaTela:
